@@ -5,6 +5,20 @@ from bs4 import BeautifulSoup
 
 #url = "http://www.yellowpages.com/tucson-az/mip/cupcakes-456735205?lid=456735205"
 
+class businessListing():
+    def __init__(self, name, streetAddress, city, state, phoneNumber):
+        self.name = name
+        self.streetAddress = streetAddress
+        self.city = city
+        self.state = state
+        self.phoneNumber = phoneNumber
+
+    def printInfo():
+        print "Name: ", self.name
+        print " Street Address: %s" % (self.streetAddress)
+        print " City: %s, State: %s" % (self.city, self.state)
+        print " Phone #: ", self.phoneNumber
+
 
 def getPageResults(url, soup):
     pageResults = []
@@ -33,9 +47,9 @@ def main():
     
         # What if soup is null?? Need to handle this exception
         pageResults = getPageResults(url, soup)
-        print pageResults
+        print pageResults[0]
 
-        for result in pageResults:
+        for result in pageResults: # restrict to one listing
             htmltext = urllib.urlopen(result).read()
             soup = BeautifulSoup(htmltext)
             for tag in soup.findAll('a', class_="business-name"):
