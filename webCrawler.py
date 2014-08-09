@@ -9,6 +9,7 @@ url = "http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes
 urls = [url] # stack of urls to scrape
 visited = [url]
 businessNames = []
+pageResults = []
 
 while len(urls) > 0:
     try:
@@ -20,10 +21,20 @@ while len(urls) > 0:
     urls.pop(0)
 
     # What if soup is null?? Need to handle this exception
-    for tag in soup.findAll('a', class_="business-name"):
-        if tag.span:
-            businessNames.append(tag.span.renderContents())
-            print tag.span.renderContents()
+
+    # Store all results into a list
+    pageResults.append(url)
+    for tag in soup.findAll('a', attrs={"data-remote":"true"}, href=True):
+        pageResults.append(urlparse.urljoin(url, tag['href']))
+
+    print pageResults
+    for result in pageResults:
+        htmltext = urllib.urlopen(result).read()
+        soup = BeautifulSoup(htmltext)
+        for tag in soup.findAll('a', class_="business-name"):
+            if tag.span:
+                businessNames.append(tag.span.renderContents())
+                print tag.span.renderContents()
 
     print "Number of busineses on this page:", len(businessNames)
         
