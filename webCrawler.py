@@ -8,6 +8,7 @@ url = "http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes
 
 urls = [url] # stack of urls to scrape
 visited = [url]
+businessNames = []
 
 while len(urls) > 0:
     try:
@@ -18,7 +19,11 @@ while len(urls) > 0:
 
     urls.pop(0)
 
+    # What if soup is null?? Need to handle this exception
     for tag in soup.findAll('a', class_="business-name"):
         if tag.span:
+            businessNames.append(tag.span.renderContents())
             print tag.span.renderContents()
+
+    print "Number of busineses on this page:", len(businessNames)
         
