@@ -1,0 +1,8 @@
+2014-08-13
+==========
+Am able to use scrapy to create a spider and crawl through yellow pages. Need to
+determine the hierarchy of tags that are needed to extract all the relevant 
+info. I think the first thing to do is to grab the business names first and 
+store those. The ideal way of doing this is to create YellowPageItem objects and
+store those into a JSON for future use.
+
