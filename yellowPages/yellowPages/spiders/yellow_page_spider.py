@@ -15,7 +15,7 @@ class YellowPageSpider(BaseSpider):
         hxs = HtmlXPathSelector(response)
         sites = hxs.select('//*[@id="main-content"]/div[4]/div[3]/div')
         for site in sites:
-            print site
+            print site.select('./@id').extract()
             # item = YellowpagesItem()
             # item['title'] = site.select('text()').extract()
             # print item['title']
