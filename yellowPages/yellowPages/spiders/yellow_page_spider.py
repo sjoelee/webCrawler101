@@ -13,9 +13,14 @@ class YellowPageSpider(BaseSpider):
 
     def parse(self, response):
         hxs = HtmlXPathSelector(response)
-        sites = hxs.select('//*[@id="main-content"]/div[4]/div[3]/div')
-        for site in sites:
-            print site.select('./@id').extract()
+        businessIDs = hxs.select('//*[@id="main-content"]/div[4]/div[3]/div/@id').extract()
+        for business in businessIDs:
+            path = '//*[@id="'+business+'"]/div/div[2]/div[2]/h3/a[1]/span'
+            businessName = hxs.select(path).extract()
+            print businessName
+        # sites = hxs.select('//*[@id="main-content"]/div[4]/div[3]/div/@id').extract()
+        # for site in sites:
+        #     print site.select('./@id').extract()
             # item = YellowpagesItem()
             # item['title'] = site.select('text()').extract()
             # print item['title']
