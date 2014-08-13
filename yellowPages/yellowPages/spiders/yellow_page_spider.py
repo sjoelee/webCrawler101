@@ -18,10 +18,13 @@ class YellowPageSpider(BaseSpider):
             businessXPath = '//*[@id="'+business+'"]/div/div[2]/div[2]'
             suffixBusinessName = '/h3/a[1]/span/text()'
             suffixBusinessStreet = '/div/div[1]/p/span[1]/text()'
+            suffixBusinessZipCode = '/div/div[1]/p/span[4]/text()'
             businessName = hxs.select(businessXPath + suffixBusinessName).extract()
             businessStreet = hxs.select(businessXPath + suffixBusinessStreet).extract()
+            businessPostal = hxs.select(businessXPath + suffixBusinessZipCode).extract()
             print businessName
             print businessStreet
+            print businessPostal
         # sites = hxs.select('//*[@id="main-content"]/div[4]/div[3]/div/@id').extract()
         # for site in sites:
         #     print site.select('./@id').extract()
