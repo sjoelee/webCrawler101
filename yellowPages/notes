@@ -72,3 +72,9 @@ Same output:
 [u'9572 E 29th St']
 
 NOTE: Still need to figure out how to go to next page of results.
+
+2014-08-20
+==========
+Figured out how to get next page of results. The yield of Requests with a
+callback makes using rules unnecessary, but perhaps it's more scalable
+and flexible to use rules (and also more challenging).
