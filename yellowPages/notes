@@ -89,4 +89,6 @@ li_text = li.xpath('.//a/text()').extract() == 'Next' doesn't work.
 This is because that the left statment yields a list of values and the right
 is a string.
 
+If yielding a Request object has a callback function, then the rules for the 
+spider are not needed. 
 
