@@ -1,6 +1,7 @@
 from scrapy.contrib.spiders import CrawlSpider, Rule
 #from scrapy.contrib.exporter import JsonItemExporter
 from scrapy.contrib.linkextractors.lxmlhtml import LxmlLinkExtractor
+from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy import Selector
 from yellowPages.items import YellowpagesItem
 from scrapy.http import Request
@@ -11,23 +12,23 @@ class YellowPageSpider(CrawlSpider):
     name = "yellowpages_v2.com"
     allowed_domains = ["www.yellowpages.com"]
     businesses = []
+    # Note: need to make this flexible to user input
     # start with one page
     start_urls = [
         "http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes",
         ]
     base_url = "http://www.yellowpages.com"
 
-# rules aren't needed....I wonder why
- #    rules = (
-# #        Rule(LxmlLinkExtractor(allow=('//page=\d*',),
-# #                               restrict_xpaths=('//*[@id="main-content"]/div[4]/div[5]/ul',)),
-# #                               callback='parse_page', follow=True),
-#         Rule(LxmlLinkExtractor(allow=('relevance&page=\d$',),
-#                                restrict_xpaths=('//*[@id="main-content"]/div[4]/div[5]/ul/li[5]/a[@class="next ajax-page"]',)),
-#                                callback='parse_page', follow=True),
-#         )
+# Need to implement rules that go to the business listing
+    rules = (
+#        Rule(LxmlLinkExtractor(allow=('//page=\d*',),
+#                               restrict_xpaths=('//*[@id="main-content"]/div[4]/div[5]/ul',)),
+#                               callback='parse_business_listings_page', follow=True),
+        Rule(SgmlLinkExtractor(allow=('.*\d+\?lid=\d+$',),),
+                               callback='parse_business_page', follow=True),
+        )
 
-    def extractBusinessesFromResponse(self,response):
+    def extract_businesses_from_response(self,response):
         hxs = Selector(response)
 
         businessIDs = hxs.xpath('//*[@id="main-content"]/div[4]/div[3]/div/@id').extract()
@@ -51,19 +52,15 @@ class YellowPageSpider(CrawlSpider):
         return businesses
         
     def parse(self, response):
-        yield Request(response.url, callback = self.parse_page)
+        yield Request(response.url, callback = self.parse_business_listings_page)
 
-    def parse_page_get_next_page_link(self, li_tags, page_num):
-        pageLinks = []
-        for p in li_tags.xpath('.//li/a[contains(@href, "page")]'):
-            link = p.xpath('@href').extract()[0]
-            pageLinks.append(link)
-            print type(link)
+    def parse_business_page(self, response):
+        print "Visiting business listing %s" % response.url
 
-    def parse_page(self, response):
+    def parse_business_listings_page(self, response):
         print "Visiting %s" % response.url
 
-        self.businesses.append(self.extractBusinessesFromResponse(response))
+        self.businesses.append(self.extract_businesses_from_response(response))
         hxs = Selector(response)
         li_tags = hxs.xpath('//*[@id="main-content"]/div[4]/div[5]/ul/li')
         next_exist = False
@@ -78,6 +75,7 @@ class YellowPageSpider(CrawlSpider):
             if (li_text and li_text[0] == 'Next'):
                 next_exist = True
                 next_page_num = li_data_page[0]
+
         if next_exist:
             for li in li_tags:
                 li_text = li.xpath('.//a/text()').extract()
@@ -85,15 +83,5 @@ class YellowPageSpider(CrawlSpider):
                 li_data_page = li.xpath('.//a/@data-page').extract()
                 if (li_data_page and li_data_page[0] == next_page_num and li_href):
                     url = self.base_url + li_href[0]
-                    yield Request(url, callback=self.parse_page)
+                    yield Request(url, callback=self.parse_business_listings_page)
 
-        # hxs = Selector(response)
-        # something = hxs.xpath('//ul').extract()
-        # print something
-        # visitedLinks = set() # keep track of the URLs that we've already visited
-        # print type(hxs)
-        # businesses = self.extractBusinessesFromResponse(response)
-
-        # return businesses
-        # nextURL = hxs.xpath('//*[@id="main-content"]/div[4]/div[5]/ul/li[2]/a/@href').extract()[0]
-        # yield Request(nextURL, callback=self.parse_page,)
