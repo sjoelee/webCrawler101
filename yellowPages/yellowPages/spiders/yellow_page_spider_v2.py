@@ -1,12 +1,16 @@
 from scrapy.contrib.spiders import CrawlSpider, Rule
+#from scrapy.contrib.exporter import JsonItemExporter
 from scrapy.contrib.linkextractors.lxmlhtml import LxmlLinkExtractor
 from scrapy import Selector
 from yellowPages.items import YellowpagesItem
 from scrapy.http import Request
 
+import json
+
 class YellowPageSpider(CrawlSpider):
     name = "yellowpages_v2.com"
     allowed_domains = ["www.yellowpages.com"]
+    businesses = []
     # start with one page
     start_urls = [
         "http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes",
@@ -17,7 +21,7 @@ class YellowPageSpider(CrawlSpider):
 # #        Rule(LxmlLinkExtractor(allow=('//page=\d*',),
 # #                               restrict_xpaths=('//*[@id="main-content"]/div[4]/div[5]/ul',)),
 # #                               callback='parse_page', follow=True),
-#         Rule(LxmlLinkExtractor(allow=('relevance&page=\d+$',),
+#         Rule(LxmlLinkExtractor(allow=('relevance&page=\d$',),
 #                                restrict_xpaths=('//*[@id="main-content"]/div[4]/div[5]/ul/li[5]/a[@class="next ajax-page"]',)),
 #                                callback='parse_page', follow=True),
 #         )
@@ -46,13 +50,9 @@ class YellowPageSpider(CrawlSpider):
         return businesses
         
     def parse(self, response):
-        self.parse_page(response)
-        businesses = self.extractBusinessesFromResponse(response)
+        yield Request(response.url, callback = self.parse_page)
 
-        url = 'http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes&s=relevance&page=2'
-        yield Request(url, callback = self.parse_page)
-
-    def parse_page_get_next_page_link(li_tags, page_num):
+    def parse_page_get_next_page_link(self, li_tags, page_num):
         pageLinks = []
         for p in li_tags.xpath('.//li/a[contains(@href, "page")]'):
             link = p.xpath('@href').extract()[0]
@@ -61,29 +61,24 @@ class YellowPageSpider(CrawlSpider):
 
     def parse_page(self, response):
         print "Visiting %s" % response.url
+
+        self.businesses.append(self.extractBusinessesFromResponse(response))
         hxs = Selector(response)
         li_tags = hxs.xpath('//*[@id="main-content"]/div[4]/div[5]/ul/li')
         
-        # Get links for the next pages
         # Check to see if there's a "Next". If there is, store the links.
         # If not, return.
         for li in li_tags:
             li_text = li.xpath('.//a/text()').extract()
             if (li_text and li_text[0] == 'Next'):
                 next_num = li.xpath('.//a/@data-page').extract()[0]
-                url = 'http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes&s=relevance&page='+next_num
+                url = 'http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes&s=relevance&page=' + next_num
                 yield Request(url, callback=self.parse_page)
 
         # pageLinks = []
         # for p in li_tags.xpath('.//a[contains(@href, "page")]'):
         #     link = p.xpath('@href').extract()[0]
         #     pageLinks.append(link)
-
-        # page = hxs.xpath('//*[@id="main-content"]/div[4]/div[5]/ul/li[5]/a/text()').extract
-        # if (page == 'Next'):
-        #     print "Next page found!"
-        # url = 'http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes&s=relevance&page=3'
-        # yield Request(url, callback = self.parse_page)
 
         # hxs = Selector(response)
         # something = hxs.xpath('//ul').extract()
