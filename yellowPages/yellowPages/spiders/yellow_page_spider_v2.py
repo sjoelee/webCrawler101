@@ -70,8 +70,10 @@ class YellowPageSpider(CrawlSpider):
         # If not, return.
         for li in li_tags:
             li_text = li.xpath('.//a/text()').extract()
+            # Note: sometimes li_text is an empty list so check to see if it is nonempty first
             if (li_text and li_text[0] == 'Next'):
                 next_num = li.xpath('.//a/@data-page').extract()[0]
+                # Assumption: that the URL has this form
                 url = 'http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes&s=relevance&page=' + next_num
                 yield Request(url, callback=self.parse_page)
 
