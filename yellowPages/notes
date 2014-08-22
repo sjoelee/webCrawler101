@@ -92,3 +92,11 @@ is a string.
 If yielding a Request object has a callback function, then the rules for the 
 spider are not needed. 
 
+2014-08-22
+==========
+Need to think of a better way to go through list of li_tags. Is this the only
+way? It requires linear time search and that should be okay given that we need
+to search through entire list anyways. But is it necessary to go through it
+again?
+
+Need to see what other information I need to extract for each business
