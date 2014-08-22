@@ -99,4 +99,6 @@ way? It requires linear time search and that should be okay given that we need
 to search through entire list anyways. But is it necessary to go through it
 again?
 
-Need to see what other information I need to extract for each business
+Need to see what other information I need to extract for each business. Need
+to crawl through specific business pages to grab website and categories as
+a first step.
