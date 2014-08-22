@@ -15,6 +15,7 @@ class YellowPageSpider(CrawlSpider):
     start_urls = [
         "http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes",
         ]
+    base_url = "http://www.yellowpages.com"
 
 # rules aren't needed....I wonder why
  #    rules = (
@@ -65,22 +66,26 @@ class YellowPageSpider(CrawlSpider):
         self.businesses.append(self.extractBusinessesFromResponse(response))
         hxs = Selector(response)
         li_tags = hxs.xpath('//*[@id="main-content"]/div[4]/div[5]/ul/li')
+        next_exist = False
         
         # Check to see if there's a "Next". If there is, store the links.
-        # If not, return.
+        # If not, return. 
+        # This requires a linear search through the list of li_tags. Is there a faster way?
         for li in li_tags:
             li_text = li.xpath('.//a/text()').extract()
+            li_data_page = li.xpath('.//a/@data-page').extract()
             # Note: sometimes li_text is an empty list so check to see if it is nonempty first
             if (li_text and li_text[0] == 'Next'):
-                next_num = li.xpath('.//a/@data-page').extract()[0]
-                # Assumption: that the URL has this form
-                url = 'http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes&s=relevance&page=' + next_num
-                yield Request(url, callback=self.parse_page)
-
-        # pageLinks = []
-        # for p in li_tags.xpath('.//a[contains(@href, "page")]'):
-        #     link = p.xpath('@href').extract()[0]
-        #     pageLinks.append(link)
+                next_exist = True
+                next_page_num = li_data_page[0]
+        if next_exist:
+            for li in li_tags:
+                li_text = li.xpath('.//a/text()').extract()
+                li_href = li.xpath('.//a/@href').extract()
+                li_data_page = li.xpath('.//a/@data-page').extract()
+                if (li_data_page and li_data_page[0] == next_page_num and li_href):
+                    url = self.base_url + li_href[0]
+                    yield Request(url, callback=self.parse_page)
 
         # hxs = Selector(response)
         # something = hxs.xpath('//ul').extract()
