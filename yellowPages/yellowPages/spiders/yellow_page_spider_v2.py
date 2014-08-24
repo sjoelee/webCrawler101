@@ -10,9 +10,7 @@ import json
 class YellowPageSpider(CrawlSpider):
     name = "yellowpages"
     allowed_domains = ['www.yellowpages.com']
-    businesses = []
     count = 0
-    num_request = 0
 
     start_urls = ['http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes',
     ]
