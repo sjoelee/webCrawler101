@@ -16,8 +16,9 @@ class YellowPageSpider(CrawlSpider):
     # start with one page
     start_urls = ['http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes']
 
-    rules = (Rule(SgmlLinkExtractor(allow=('\d+\?lid=\d+$',),),
-                  callback='parse_business_page', follow=True),
+    rules = (
+        # Rule(SgmlLinkExtractor(allow=('\d+\?lid=\d+$',),),
+        #           callback='parse_business_page', follow=True),
              Rule(SgmlLinkExtractor(allow=('relevance\&page=\d?$',),
                                     restrict_xpaths=('//*[@id="main-content"]/div[4]/div[5]/ul',)),
                   follow=True),

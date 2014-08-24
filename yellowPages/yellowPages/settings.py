@@ -13,5 +13,5 @@ SPIDER_MODULES = ['yellowPages.spiders']
 NEWSPIDER_MODULE = 'yellowPages.spiders'
 DEFAULT_ITEM_CLASS = 'yellowPages.items.YellowpagesItem'
 USER_AGENT = '%s/%s' % (BOT_NAME, BOT_VERSION)
-#DEPTH_LIMIT = 1
+DEPTH_LIMIT = 2
 DOWNLOAD_DELAY = 2
