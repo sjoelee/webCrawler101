@@ -102,3 +102,23 @@ again?
 Need to see what other information I need to extract for each business. Need
 to crawl through specific business pages to grab website and categories as
 a first step.
+
+Want to see if my regex is sufficient to match the href links that contain
+business-specific information. 
+
+Under the python shell, imported the regex library (re) and pasted the url as
+well as the regex that i'm matching the URL with and saw that the match works:
+
+<code>
+>>> import re
+>>> url1 = 'http://www.yellowpages.com/tucson-az/mip/sweet-tooshies-bakery-471865645?lid=471865645'
+>>> regex1 = re.compile('\d+\?lid=\d+')
+>>> regex1.search(url1)
+<_sre.SRE_Match object at 0x101a9d7e8>
+</code>
+
+2014-08-23
+==========
+Able to use rules to crawl through all business listings in a listings page.
+Really cut down on code. However, not able to crawl and grab through all 102
+items. Need to figure out why. There are, however, 102 requests being sent.

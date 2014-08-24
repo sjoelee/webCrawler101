@@ -12,16 +12,16 @@ class YellowPageSpider(CrawlSpider):
     allowed_domains = ['www.yellowpages.com']
     businesses = []
     count = 0
+    num_request = 0
 
     start_urls = ['http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes']
 
     rules = (
-             Rule(SgmlLinkExtractor(allow=('\d+\?lid=\d+$',),),
-                  callback='parse_business_page', follow=True),
              Rule(SgmlLinkExtractor(allow=('&page=\d$',),),#allow=('/tucson-az/cupcakes\?g=tucson%2C%20az&q=cupcakes&s=relevance&page=\d',),),
 #                                    restrict_xpaths=('//*[@id="main-content"]/div[4]/div[5]/ul',)),
-                  callback='parse_listings',
-                  follow=True),
+                  callback='parse_listings', follow=True),
+             Rule(SgmlLinkExtractor(allow=('\d+\?lid=\d+$',),),
+                  callback='parse_business_page', follow=True, process_request='parse_business_request'),
     )
 
     base_url = 'http://www.yellowpages.com'
@@ -29,6 +29,10 @@ class YellowPageSpider(CrawlSpider):
     def parse_listings(self, response):
         print "Visiting %s" % response.url
         yield Request(response.url)
+
+    def parse_business_request(self, request):
+        self.num_request = self.num_request + 1
+        print "# %d request sent to %s" % (self.num_request, request.url)
 
     def parse_business_page(self, response):
         hxs = Selector(response)
