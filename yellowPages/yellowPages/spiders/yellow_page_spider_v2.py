@@ -12,11 +12,15 @@ class YellowPageSpider(CrawlSpider):
     allowed_domains = ['www.yellowpages.com']
     businesses = []
 
+#    start_urls = ['http://www.yellowpages.com/tucson-az/mip/cupcakes-456735205?lid=456735205']
     # start with one page
     start_urls = ['http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes']
 
     rules = (Rule(SgmlLinkExtractor(allow=('\d+\?lid=\d+$',),),
                   callback='parse_business_page', follow=True),
+             Rule(SgmlLinkExtractor(allow=('relevance\&page=\d?$',),
+                                    restrict_xpaths=('//*[@id="main-content"]/div[4]/div[5]/ul',)),
+                  follow=True),
     )
 
     base_url = 'http://www.yellowpages.com'
@@ -35,10 +39,10 @@ class YellowPageSpider(CrawlSpider):
             suffixBusinessPhone   = '/div/div[1]/ul/li/text()'
 
             businessItem = YellowpagesItem()
-            businessItem['businessName']   = hxs.xpath(businessXPath + suffixBusinessName).extract()
-            businessItem['businessStreet'] = hxs.xpath(businessXPath + suffixBusinessStreet).extract()
-            businessItem['businessPostal'] = hxs.xpath(businessXPath + suffixBusinessPostal).extract()
-            businessItem['businessPhone']  = hxs.xpath(businessXPath + suffixBusinessPhone).extract()
+            businessItem['Name']   = hxs.xpath(businessXPath + suffixBusinessName).extract()
+            businessItem['Street'] = hxs.xpath(businessXPath + suffixBusinessStreet).extract()
+            businessItem['Postal'] = hxs.xpath(businessXPath + suffixBusinessPostal).extract()
+            businessItem['Phone']  = hxs.xpath(businessXPath + suffixBusinessPhone).extract()
 
             businesses.append(businessItem)
 
@@ -49,8 +53,24 @@ class YellowPageSpider(CrawlSpider):
 
     def parse_business_page(self, response):
         hxs = Selector(response)
-        links = hxs.xpath('//a/@href')
-        print "BLISTING: Visiting business listing %s" % response.url
+        categories = hxs.xpath('//*[@id="business-details"]/dl/dd[4]')
+        contact = hxs.xpath('//*[@id="main-content"]/div[1]/div[1]/div/section[2]/div[1]')
+        businessItem = YellowpagesItem()
+        bNameXPath_list = hxs.xpath('//*[@id="main-content"]/div[1]/div[1]/h1/text()').extract()        
+        businessItem['Name'] = bNameXPath_list[0] if bNameXPath_list else ''
+        bStreetXPath_list = contact.xpath('./p[@class="street-address"]/text()').extract()
+        businessItem['Street'] = bStreetXPath_list[0] if bStreetXPath_list else ''
+        bCityState_list = contact.xpath('./p[@class="city-state"]/text()').extract()
+        businessItem['City_State'] = bCityState_list[0] if bCityState_list else ''
+        bPhone_list = contact.xpath('./p[@class="phone"]/text()').extract()
+        businessItem['Phone'] = bPhone_list[0] if bPhone_list else ''
+
+        # print businessItem['Name']
+        # print businessItem['Street']
+        # print businessItem['City_State']
+        # print businessItem['Phone']
+
+        return businessItem
 
     def parse_business_listings_page(self, response):
         print "Visiting %s" % response.url
