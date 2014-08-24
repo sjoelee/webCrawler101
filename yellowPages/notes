@@ -133,3 +133,5 @@ a callback to log the specific GET requests sent to the server. It turns out
 that there are duplicate postings on the yellowpages results. Who'd have known?
 Counting the duplicates, there are 15 of them and hence the discrepancy in the
 two values.
+
+Next steps are to modify the form input so that it is 
