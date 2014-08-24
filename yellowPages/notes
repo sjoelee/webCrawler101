@@ -120,5 +120,16 @@ well as the regex that i'm matching the URL with and saw that the match works:
 2014-08-23
 ==========
 Able to use rules to crawl through all business listings in a listings page.
-Really cut down on code. However, not able to crawl and grab through all 102
+Really cut down on code. However, not able to crawl and grab through all 100
 items. Need to figure out why. There are, however, 102 requests being sent.
+
+Can see if we can use start_requests() to fill out the form for YP
+
+2014-08-24
+==========
+Looked into why the crawler only had 85 items scraped as opposed to the 100 
+that existed in the results of the yellowpages. I logged the requests by having
+a callback to log the specific GET requests sent to the server. It turns out 
+that there are duplicate postings on the yellowpages results. Who'd have known?
+Counting the duplicates, there are 15 of them and hence the discrepancy in the
+two values.
