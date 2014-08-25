@@ -145,6 +145,13 @@ state, and postal. That way it would be allow for easier processing.
 Figured out HTTP GET request that is needed for Scrapy to form a request so the
 spider can be generalized to search for other categories in different locations.
 
+Went to http://www.hurl.it/ to try out the HTTP Request and looked at the network
+tab when inspecting elements for the yellowpages results. Figured out the fields
+that are being populated and also realized that the HTTP request is not a POST,
+but a GET. This makes sense since we're not really updating any kind of HTML page
+on the server, but forming a request (with parameters being filled) and getting
+the page back. The specific fields are "search_terms" and "geo_location_terms"
+
 Also fixed a minor bug that didn't scrape an item if the city_state_string is
 empty.
 
