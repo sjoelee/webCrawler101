@@ -139,3 +139,13 @@ query.
 
 Modified the fields for the item and split up the city_state field to city, 
 state, and postal. That way it would be allow for easier processing. 
+
+2014-08-25
+==========
+Figured out HTTP GET request that is needed for Scrapy to form a request so the
+spider can be generalized to search for other categories in different locations.
+
+Also fixed a minor bug that didn't scrape an item if the city_state_string is
+empty.
+
+

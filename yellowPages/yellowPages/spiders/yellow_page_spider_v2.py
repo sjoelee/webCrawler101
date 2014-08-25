@@ -22,14 +22,13 @@ class YellowPageSpider(CrawlSpider):
     # Customizable parameters for the query
     #
     category = 'cupcakes'
-    city = 'tucson'
-    state = 'az'
+    location = 'tucson, az'
 
     #
     # Form initial query
     #
-    url = base_url+'/'+city+'-'+state+'/'+category
-    start_urls = [url]
+    # url = base_url+'/'+city+'-'+state+'/'+category
+    # start_urls = [url]
 
     #
     # Create rules for the spider:
@@ -43,6 +42,11 @@ class YellowPageSpider(CrawlSpider):
              Rule(SgmlLinkExtractor(allow=('\d+\?lid=\d+$',),),
                   callback='parse_business_page', follow=True),
     )
+
+    def start_requests(self):
+        yield FormRequest("http://www.yellowpages.com/search/", method='GET',
+                          formdata={'search_terms':self.category, 'geo_location_terms':self.location},
+                          callback=self.parse)
 
     # 
     # Function: parse_business_page - Callback to scrape information specific to
@@ -70,12 +74,14 @@ class YellowPageSpider(CrawlSpider):
         businessItem['Name']   = bNameXPath_list[0] if bNameXPath_list else ''
         businessItem['Street'] = bStreetXPath_list[0] if bStreetXPath_list else ''
         businessItem['Phone']  = bPhone_list[0] if bPhone_list else ''
-        city_state_string      = bCityState_list[0] if bCityState_list else ''
-
-        businessItem['City'], businessItem['State'], businessItem['Postal'] = city_state_string.split()
-        businessItem['City'] = businessItem['City'].strip(',')
-        businessItem['Postal'] = int(businessItem['Postal'])
-        businessItem['Street'] = businessItem['Street'].strip(',')
+        if bCityState_list:
+            city_state_string      = bCityState_list[0]
+            businessItem['City'], businessItem['State'], businessItem['Postal'] = city_state_string.split()
+            businessItem['City'] = businessItem['City'].strip(',')
+            businessItem['Postal'] = int(businessItem['Postal'])
+            businessItem['Street'] = businessItem['Street'].strip(',')
+        else:
+            city_state_string = ''
 
         return businessItem
 
