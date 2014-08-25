@@ -8,11 +8,18 @@ from scrapy.http import Request, FormRequest
 class YellowPageSpider(CrawlSpider):
     name = "yellowpages"
     allowed_domains = ['www.yellowpages.com']
+    base_url = 'http://www.yellowpages.com'
 
+    #
+    # Customizable parameters for the query
+    #
     category = 'cupcakes'
     city = 'tucson'
     state = 'az'
-    base_url = 'http://www.yellowpages.com'
+
+    #
+    # Form initial query
+    #
     url = base_url+'/'+city+'-'+state+'/'+category
     start_urls = [url]
 
