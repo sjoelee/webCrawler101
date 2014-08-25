@@ -13,16 +13,15 @@ class YellowPageSpider(CrawlSpider):
     city = 'tucson'
     state = 'az'
     base_url = 'http://www.yellowpages.com'
-    url = base_url + '/' + city + '-' + state + '/' + category +'?g=' + city + '%2C%20' + state + '&q=' + category
+    url = base_url+'/'+city+'-'+state+'/'+category
     start_urls = [url]
 
     rules = (
-             Rule(SgmlLinkExtractor(allow=('&page=\d$',),),
+             Rule(SgmlLinkExtractor(allow=('page=\d$',),),
                   follow=True),
              Rule(SgmlLinkExtractor(allow=('\d+\?lid=\d+$',),),
                   callback='parse_business_page', follow=True),
     )
-
 
     def parse_business_page(self, response):
         #
