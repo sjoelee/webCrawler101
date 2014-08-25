@@ -5,15 +5,15 @@ from scrapy import Selector
 from yellowPages.items import YellowpagesItem
 from scrapy.http import Request, FormRequest
 
-import json
-
 class YellowPageSpider(CrawlSpider):
     name = "yellowpages"
     allowed_domains = ['www.yellowpages.com']
-    count = 0
 
-    start_urls = ['http://www.yellowpages.com/tucson-az/cupcakes?g=tucson%2C%20az&q=cupcakes',
-    ]
+    category = 'cupcakes'
+    city = 'tucson'
+    state = 'az'
+    url = 'http://www.yellowpages.com/' + city + '-' + state + '/' + category +'?g=' + city + '%2C%20' + state + '&q=' + category
+    start_urls = [url]
 
     rules = (
              Rule(SgmlLinkExtractor(allow=('&page=\d$',),),
@@ -38,9 +38,6 @@ class YellowPageSpider(CrawlSpider):
         businessItem['Street']     = bStreetXPath_list[0] if bStreetXPath_list else ''
         businessItem['City_State'] = bCityState_list[0] if bCityState_list else ''
         businessItem['Phone']      = bPhone_list[0] if bPhone_list else ''
-
-        self.count = self.count + 1
-        print self.count
 
         return businessItem
 
