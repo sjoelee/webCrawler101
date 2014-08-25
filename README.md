@@ -2,4 +2,4 @@
 Web Crawler
 =======
 
-Right now trying to figure out how to crawl through a YellowPage link
+Crawl through all the YellowPagelinks and scrape items for every cupcake business in Tucson, AZ
