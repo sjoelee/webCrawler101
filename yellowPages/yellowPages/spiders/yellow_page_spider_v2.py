@@ -12,7 +12,8 @@ class YellowPageSpider(CrawlSpider):
     category = 'cupcakes'
     city = 'tucson'
     state = 'az'
-    url = 'http://www.yellowpages.com/' + city + '-' + state + '/' + category +'?g=' + city + '%2C%20' + state + '&q=' + category
+    base_url = 'http://www.yellowpages.com'
+    url = base_url + '/' + city + '-' + state + '/' + category +'?g=' + city + '%2C%20' + state + '&q=' + category
     start_urls = [url]
 
     rules = (
@@ -22,22 +23,31 @@ class YellowPageSpider(CrawlSpider):
                   callback='parse_business_page', follow=True),
     )
 
-    base_url = 'http://www.yellowpages.com'
 
     def parse_business_page(self, response):
+        #
+        # Set up xpaths for populating item entries
+        #
         hxs               = Selector(response)
-        categories        = hxs.xpath('//*[@id="business-details"]/dl/dd[4]')
         contact           = hxs.xpath('//*[@id="main-content"]/div[1]/div[1]/div/section[2]/div[1]')
         bNameXPath_list   = hxs.xpath('//*[@id="main-content"]/div[1]/div[1]/h1/text()').extract()        
         bStreetXPath_list = contact.xpath('./p[@class="street-address"]/text()').extract()
         bCityState_list   = contact.xpath('./p[@class="city-state"]/text()').extract()
         bPhone_list       = contact.xpath('./p[@class="phone"]/text()').extract()
 
-        businessItem               = YellowpagesItem()
-        businessItem['Name']       = bNameXPath_list[0] if bNameXPath_list else ''
-        businessItem['Street']     = bStreetXPath_list[0] if bStreetXPath_list else ''
-        businessItem['City_State'] = bCityState_list[0] if bCityState_list else ''
-        businessItem['Phone']      = bPhone_list[0] if bPhone_list else ''
+        #
+        # Grab specific business fields
+        #
+        businessItem           = YellowpagesItem()
+        businessItem['Name']   = bNameXPath_list[0] if bNameXPath_list else ''
+        businessItem['Street'] = bStreetXPath_list[0] if bStreetXPath_list else ''
+        businessItem['Phone']  = bPhone_list[0] if bPhone_list else ''
+        city_state_string      = bCityState_list[0] if bCityState_list else ''
+
+        businessItem['City'], businessItem['State'], businessItem['Postal'] = city_state_string.split()
+        businessItem['City'] = businessItem['City'].strip(',')
+        businessItem['Postal'] = int(businessItem['Postal'])
+        businessItem['Street'] = businessItem['Street'].strip(',')
 
         return businessItem
 

@@ -134,4 +134,8 @@ that there are duplicate postings on the yellowpages results. Who'd have known?
 Counting the duplicates, there are 15 of them and hence the discrepancy in the
 two values.
 
-Next steps are to modify the form input so that it is 
+Next steps are to modify the form input so that it is flexible for any kind of 
+query.
+
+Modified the fields for the item and split up the city_state field to city, 
+state, and postal. That way it would be allow for easier processing. 
