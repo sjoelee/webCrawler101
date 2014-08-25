@@ -1,3 +1,11 @@
+"""
+This module extends CrawlSpider and crawls through a Yellow Page set of results
+based on a category and (city, state) query. 
+
+For every page of results, the YellowPageSpider crawls and scrapes specific
+business listings and returns the resulting item.
+"""
+
 from scrapy.contrib.spiders import CrawlSpider, Rule
 #from scrapy.contrib.exporter import JsonItemExporter
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
@@ -23,6 +31,12 @@ class YellowPageSpider(CrawlSpider):
     url = base_url+'/'+city+'-'+state+'/'+category
     start_urls = [url]
 
+    #
+    # Create rules for the spider:
+    # 1st Rule: to crawl through different page results of listings that match
+    #           the query
+    # 2nd Rule: to crawl through the business-specific listing link
+    #
     rules = (
              Rule(SgmlLinkExtractor(allow=('page=\d$',),),
                   follow=True),
@@ -30,6 +44,14 @@ class YellowPageSpider(CrawlSpider):
                   callback='parse_business_page', follow=True),
     )
 
+    # 
+    # Function: parse_business_page - Callback to scrape information specific to
+    #           business listing
+    # 
+    # parameters: 
+    #  - self - reference to object
+    #  - response - HTTP response
+    #
     def parse_business_page(self, response):
         #
         # Set up xpaths for populating item entries
